@@ -1,0 +1,74 @@
+diff --git a/src/bin/jp2/convertpng.c b/src/bin/jp2/convertpng.c
+index 00f596e..af3f91e 100644
+--- a/src/bin/jp2/convertpng.c
++++ b/src/bin/jp2/convertpng.c
+@@ -75,10 +75,10 @@ opj_image_t *pngtoimage(const char *read_idf, opj_cparameters_t * params)
+     png_uint_32  width, height = 0U;
+     int color_type;
+     FILE *reader = NULL;
+-    OPJ_BYTE** rows = NULL;
+-    OPJ_INT32* row32s = NULL;
++    OPJ_BYTE** volatile rows = NULL;
++    OPJ_INT32* volatile row32s = NULL;
+     /* j2k: */
+-    opj_image_t *image = NULL;
++    opj_image_t* volatile image = NULL;
+     opj_image_cmptparm_t cmptparm[4];
+     OPJ_UINT32 nr_comp;
+     OPJ_BYTE sigbuf[8];
+diff --git a/src/bin/jp2/converttif.c b/src/bin/jp2/converttif.c
+index 9d1037a..8d5002a 100644
+--- a/src/bin/jp2/converttif.c
++++ b/src/bin/jp2/converttif.c
+@@ -720,7 +720,7 @@ int imagetotif(opj_image_t * image, const char *outfile)
+         TIFFClose(tif);
+         return 1;
+     }
+-    rowStride = (int64_t)((width * numcomps * bps + 7U) / 8U);
++    rowStride = ((int64_t)width * numcomps * bps + 7U) / 8U;
+     if (rowStride != strip_size) {
+         fprintf(stderr, "Invalid TIFF strip size\n");
+         TIFFClose(tif);
+@@ -1283,8 +1283,6 @@ opj_image_t* tiftoimage(const char *filename, opj_cparameters_t *parameters)
+     TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &tiSpp);
+     TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &tiPhoto);
+     TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &tiPC);
+-    w = (int)tiWidth;
+-    h = (int)tiHeight;
+ 
+     if (tiSpp == 0 || tiSpp > 4) { /* should be 1 ... 4 */
+         fprintf(stderr, "tiftoimage: Bad value for samples per pixel == %d.\n"
+@@ -1451,7 +1449,7 @@ opj_image_t* tiftoimage(const char *filename, opj_cparameters_t *parameters)
+         return NULL;
+     }
+ 
+-    rowStride = (int64_t)((tiWidth * tiSpp * tiBps + 7U) / 8U);
++    rowStride = ((int64_t)tiWidth * tiSpp * tiBps + 7U) / 8U;
+     buffer32s = (OPJ_INT32 *)malloc(sizeof(OPJ_INT32) * tiWidth * tiSpp);
+     if (buffer32s == NULL) {
+         _TIFFfree(buf);
+diff --git a/src/lib/openjp2/j2k.c b/src/lib/openjp2/j2k.c
+index 8e343ab..c13d229 100644
+--- a/src/lib/openjp2/j2k.c
++++ b/src/lib/openjp2/j2k.c
+@@ -7075,7 +7075,7 @@ static OPJ_BOOL opj_j2k_is_imf_compliant(opj_cparameters_t *parameters,
+     /* Validate sublevel */
+     assert(sizeof(tabMaxSubLevelFromMainLevel) ==
+            (OPJ_IMF_MAINLEVEL_MAX + 1) * sizeof(tabMaxSubLevelFromMainLevel[0]));
+-    if (sublevel > tabMaxSubLevelFromMainLevel[mainlevel]) {
++    if (mainlevel <= OPJ_IMF_MAINLEVEL_MAX && sublevel > tabMaxSubLevelFromMainLevel[mainlevel]) {
+         opj_event_msg(p_manager, EVT_WARNING,
+                       "IMF profile require sublevel <= %d for mainlevel = %d.\n"
+                       "-> %d is thus not compliant\n"
+diff --git a/src/lib/openjp2/t2.c b/src/lib/openjp2/t2.c
+index 1481e16..d46bfb4 100644
+--- a/src/lib/openjp2/t2.c
++++ b/src/lib/openjp2/t2.c
+@@ -821,6 +821,7 @@ static OPJ_BOOL opj_t2_encode_packet(OPJ_UINT32 tileno,
+             opj_event_msg(p_manager, EVT_ERROR,
+                           "opj_t2_encode_packet(): accessing precno=%u >= %u\n",
+                           precno, res->pw * res->ph);
++            opj_bio_destroy(bio);
+             return OPJ_FALSE;
+         }
+ 
