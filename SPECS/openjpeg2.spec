@@ -8,7 +8,7 @@
 
 Name:           openjpeg2
 Version:        2.4.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD
@@ -24,9 +24,13 @@ Source1:        data.tar.xz
 Patch0:         openjpeg2_opj2.patch
 # Fix CVE-2021-29338
 Patch1:         openjpeg2-CVE-2021-29338.patch
-# Fix CVE-2021-3575
+# Fix CVE-2021-3575 https://github.com/uclouvain/openjpeg/commit/7bd884f8750892de4f50bf4642fcfbe7011c6bdf
 Patch2:         openjpeg2-CVE-2021-3575.patch
 Patch3:         openjpeg2-CVE-2022-1122.patch
+# https://github.com/uclouvain/openjpeg/commit/98592ee6d6904f1b48e8207238779b89a63befa2 for < 2.5.3
+Patch4:         openjpeg2-2.5.2-cve-2024-56826.patch
+# https://github.com/uclouvain/openjpeg/commit/e492644fbded4c820ca55b5e50e598d346e850e8 for < 2.5.3
+Patch5:         openjpeg2-2.5.2-cve-2024-56827.patch
 
 BuildRequires:  cmake
 # The library itself is C only, but there is some optional C++ stuff, hence the project is not marked as C-only in cmake and hence cmake looks for a c++ compiler
@@ -328,6 +332,9 @@ chmod +x %{buildroot}%{_bindir}/opj2_jpip_viewer
 
 
 %changelog
+* Thu Jan 23 2025 Michal Hlavinka <mhlavink@redhat.com> - 2.4.0-8
+- fix two heap buffer overflows CVE-2024-56826 and CVE-2024-52827 (RHEL-72519,RHEL-72521)
+
 * Wed Jun 15 2022 Matej Mužila <mmuzila@redhat.com> - 2.4.0-7
 - Fix CVE-2022-1122
 
