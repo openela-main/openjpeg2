@@ -14,7 +14,7 @@
 
 Name:           openjpeg2
 Version:        2.5.2
-Release:        4%{?dist}.1
+Release:        5%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD
@@ -30,7 +30,7 @@ Source1:        data.tar.xz
 Patch0:         openjpeg2_opj2.patch
 Patch1:         openjpeg2-2.5.2-cve-2024-56826.patch
 Patch2:         openjpeg2-2.5.2-cve-2024-56827.patch
-# from upstream, for <= 2.5.3, RHEL-107569, CVE-2025-54784
+# from upstream, for <= 2.5.3, RHEL-107568, CVE-2025-54784
 Patch3:         openjpeg2-2.5.2-pr1753.diff
 
 BuildRequires:  cmake
@@ -444,8 +444,8 @@ rm -rf %{buildroot}%{mingw64_datadir}/doc
 
 
 %changelog
-* Mon Aug 11 2025 Michal Hlavinka <mhlavink@redhat.com> - 2.5.2-4.1
-- fix CVE-2025-54874: OOB heap memory write (RHEL-107569)
+* Mon Aug 11 2025 Michal Hlavinka <mhlavink@redhat.com> - 2.5.2-5
+- fix CVE-2025-54874: OOB heap memory write (RHEL-107568)
 
 * Thu Jan 23 2025 Michal Hlavinka <mhlavink@redhat.com> - 2.5.2-4
 - fix two heap buffer overflows CVE-2024-56826 and CVE-2024-52827 (RHEL-72518,RHEL-72520)
